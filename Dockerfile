@@ -1,6 +1,6 @@
 FROM node:20-buster
 
-LABEL version="13.11.2"
+LABEL version="1.0.0"
 LABEL repository="https://github.com/drewrawitz/firebase-action"
 LABEL homepage="https://github.com/drewrawitz/firebase-action"
 LABEL maintainer="Jeremy Shore <w9jds@github.com>"
