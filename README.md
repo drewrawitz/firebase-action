@@ -6,35 +6,37 @@ If you want a more flexible implementation, an early version of a rewrite is ava
 
 ## Inputs
 
-* `args` - **Required**. This is the arguments you want to use for the `firebase` cli
+- `args` - **Required**. This is the arguments you want to use for the `firebase` cli
 
 ## Outputs
 
-~~* `response` - The full response from the firebase command current run (Will most likely require a grep to get what you want, like URLS)~~
+~~\* `response` - The full response from the firebase command current run (Will most likely require a grep to get what you want, like URLS)~~
 
 _**Response has been removed for now as it caused loads of issues in the bash script**_
 
-
 ## Environment variables
 
-* `GCP_SA_KEY` - **Required if FIREBASE_TOKEN is not set**. A **normal** service account key (json format) or a **base64 encoded** service account key with the needed permissions for what you are trying to deploy/update.
-  * Since the service account is using the App Engine default service account in the deploy process, it also needs the `Service Account User` role.
-  * If deploying functions, you would also need the `Cloud Functions Developer` role.
-    * If the deploy has scheduled functions, include the `Cloud Scheduler Admin` role.
-    * If the deploy requires access to secrets, include the `Secret Manager Viewer` role.
-    * If updating Firestore Rules, include the `Firebase Rules Admin` role.
-    * If the project is using Blocking functions (beforeCreate or beforeSignin) , include the `Firebase Functions Admin` role.
-  * If updating Firestore Indexes, include the `Cloud Datastore Index Admin` role.
-  * If deplying Hosting files, include the `Firebase Hosting Admin` role.
-  * For more details: https://firebase.google.com/docs/hosting/github-integration
+- `GCP_SA_KEY` - **Required if FIREBASE_TOKEN is not set**. A **normal** service account key (json format) or a **base64 encoded** service account key with the needed permissions for what you are trying to deploy/update.
 
-* `FIREBASE_TOKEN` - **Required if GCP_SA_KEY is not set**. _**This method will soon be deprecated, use `GCP_SA_KEY` instead**_. The token to use for authentication. This token can be aquired through the `firebase login:ci` command.
+  - Since the service account is using the App Engine default service account in the deploy process, it also needs the `Service Account User` role.
+  - If deploying functions, you would also need the `Cloud Functions Developer` role.
+    - If the deploy has scheduled functions, include the `Cloud Scheduler Admin` role.
+    - If the deploy requires access to secrets, include the `Secret Manager Viewer` role.
+    - If updating Firestore Rules, include the `Firebase Rules Admin` role.
+    - If the project is using Blocking functions (beforeCreate or beforeSignin) , include the `Firebase Functions Admin` role.
+  - If updating Firestore Indexes, include the `Cloud Datastore Index Admin` role.
+  - If deplying Hosting files, include the `Firebase Hosting Admin` role.
+  - For more details: https://firebase.google.com/docs/hosting/github-integration
 
-* `PROJECT_ID` - **Optional**. To specify a specific project to use for all commands. Not required if you specify a project in your `.firebaserc` file. If you use this, you need to give `Viewer` permission roles to your service account otherwise the action will fail with authentication errors.
+- `FIREBASE_TOKEN` - **Required if GCP_SA_KEY is not set**. _**This method will soon be deprecated, use `GCP_SA_KEY` instead**_. The token to use for authentication. This token can be aquired through the `firebase login:ci` command.
 
-* `PROJECT_PATH` - **Optional**. The path to the folder containing `firebase.json` if it doesn't exist at the root of your repository. e.g. `./my-app`.
+- `GOOGLE_APPLICATION_CREDENTIALS` - **Required if GCP_SA_KEY or FIREBASE_TOKEN is not set**. the location of a credential JSON file. For more details: https://cloud.google.com/docs/authentication/application-default-credentials#GAC
 
-* `CONFIG_VALUES` - **Optional**. The configuration values for Firebase function that would normally be set with `firebase functions:config:set [value]`. Example: `CONFIG_VALUES: stripe.secret_key=SECRET_KEY zapier.secret_key=SECRET_KEY`.
+- `PROJECT_ID` - **Optional**. To specify a specific project to use for all commands. Not required if you specify a project in your `.firebaserc` file. If you use this, you need to give `Viewer` permission roles to your service account otherwise the action will fail with authentication errors.
+
+- `PROJECT_PATH` - **Optional**. The path to the folder containing `firebase.json` if it doesn't exist at the root of your repository. e.g. `./my-app`.
+
+- `CONFIG_VALUES` - **Optional**. The configuration values for Firebase function that would normally be set with `firebase functions:config:set [value]`. Example: `CONFIG_VALUES: stripe.secret_key=SECRET_KEY zapier.secret_key=SECRET_KEY`.
 
 ## Example
 
@@ -82,13 +84,13 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 ```
+
 Alternatively:
 
 ```yaml
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+env:
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
 ```
-
 
 If you have multiple hosting environments you can specify which one in the args line.
 e.g. `args: deploy --only hosting:[environment name]`
@@ -96,8 +98,8 @@ e.g. `args: deploy --only hosting:[environment name]`
 If you want to add a message to a deployment (e.g. the Git commit message) you need to take extra care and escape the quotes or the YAML breaks.
 
 ```yaml
-        with:
-          args: deploy --message \"${{ github.event.head_commit.message }}\"
+with:
+  args: deploy --message \"${{ github.event.head_commit.message }}\"
 ```
 
 ## Alternate versions
@@ -105,19 +107,17 @@ If you want to add a message to a deployment (e.g. the Git commit message) you n
 Starting with version v2.1.2 each version release will point to a versioned docker image allowing for hardening our pipeline (so things don't break when I do something dump). On top of this, you can also point to a `master` version if you would like to test out what might not be deployed into a release yet by using something like this:
 
 ```yaml
-  name: Deploy to Firebase
-  uses: docker://w9jds/firebase-action:master
-  with:
-    args: deploy --only hosting
-  env:
-    FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-
+name: Deploy to Firebase
+uses: docker://w9jds/firebase-action:master
+with:
+  args: deploy --only hosting
+env:
+  FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 ```
 
 ## License
 
 The Dockerfile and associated scripts and documentation in this project are released under the [MIT License](LICENSE).
-
 
 ### Recommendation
 
